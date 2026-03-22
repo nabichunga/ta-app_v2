@@ -2,12 +2,42 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TA 자아 상태 진단</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 body { font-family: sans-serif; padding:20px; }
-.question { margin-bottom:15px; }
-button { padding:10px 20px; margin-top:20px; }
+.question { margin-bottom:20px; }
+
+/* ⭐ 큰 사각형 버튼 */
+label {
+  display:inline-block;
+  width:55px;
+  height:55px;
+  line-height:55px;
+  text-align:center;
+  border:1px solid #ccc;
+  border-radius:8px;
+  margin:4px;
+  font-size:18px;
+  cursor:pointer;
+}
+
+/* 선택 표시 */
+input[type=radio] { display:none; }
+
+input[type=radio]:checked + span {
+  background:#4CAF50;
+  color:#fff;
+  border-radius:8px;
+  display:inline-block;
+  width:55px;
+  height:55px;
+  line-height:55px;
+}
+
+/* 결과 */
 #result { margin-top:30px; }
 </style>
 </head>
@@ -19,28 +49,24 @@ button { padding:10px 20px; margin-top:20px; }
 <div>
 <b>검사 안내</b><br><br>
 • 검사명: TA 자아 상태 진단<br>
-• 문항 수: 총 50문항<br>
+• 문항 수: 50문항<br>
 • 소요시간: 약 10분<br><br>
 
 <b>응답 방법</b><br>
-각 문항을 읽고 자신과 얼마나 일치하는지 선택하세요.<br><br>
+각 문항을 읽고 해당되는 정도를 선택하세요<br><br>
 
 5점 척도<br>
-- 매우 그렇다 (5)<br>
-- 그렇다 (4)<br>
-- 보통 (3)<br>
-- 아니다 (2)<br>
-- 전혀 아니다 (1)<br><br>
+5 매우 그렇다 / 4 그렇다 / 3 보통 / 2 아니다 / 1 전혀 아니다<br><br>
 
 <b>유의사항</b><br>
-- 객관적으로 응답해주세요<br>
-- ‘되고 싶은 모습’이 아닌 ‘실제 나’ 기준으로 선택하세요
+- 실제 모습 기준으로 응답하세요
 </div>
 
 <hr>
 
 <form id="quiz"></form>
-<button onclick="calculate()">결과 보기</button>
+
+<button onclick="showResult()">결과 보기</button>
 
 <div id="result"></div>
 <canvas id="chart"></canvas>
@@ -49,145 +75,121 @@ button { padding:10px 20px; margin-top:20px; }
 
 const scriptURL = "https://script.google.com/macros/s/AKfycbyGWV48MwQASq_BSxUJkcO-O9kmwyi6nu0ZUsfU98lgXdta81Hnn9v12PXnoOBeSmuK/exec";
 
-// ⭐ 문장 그대로 사용 + 유형 재배치 완료
+// ✅ 문항 그대로 유지
 const questions = [
+["나는 규칙과 기준을 지키는 것을 중요하게 생각한다","CP"],
+["나는 나보다 다른 사람을 먼저 배려하려 한다","NP"],
+["나는 말과 행동을 할 때 냉정하고 침착하게 한다","A"],
+["나는 감정을 솔직하게 표현한다","FC"],
+["나는 다른 사람 기대에 맞추려 한다","AC"],
 
-{t:"나는 규칙과 기준을 지키는 것을 중요하게 생각한다",type:"CP"},
-{t:"나는 나보다 다른 사람을 먼저 배려하려 한다",type:"NP"},
-{t:"나는 말과 행동을 할 때 냉정하고 침착하게 한다",type:"A"},
-{t:"나는 감정을 솔직하게 표현한다",type:"FC"},
-{t:"나는 다른 사람 기대에 맞추려 한다",type:"AC"},
+["나는 어떤 사건에대해 잘 잘못을 가리지 않으면 마음이 편치 않다","CP"],
+["나는 사람을 챙기는 편이다","NP"],
+["나는 논리적이고 객관성을 유지하려고 한다","A"],
+["나는 즐거운 분위기를 만든다","FC"],
+["나는 갈등을 피하려 한다","AC"],
 
-{t:"나는 어떤 사건에대해 잘 잘못을 가리지 않으면 마음이 편치 않다",type:"CP"},
-{t:"나는 사람을 챙기는 편이다",type:"NP"},
-{t:"나는 논리적이고 객관성을 유지하려고 한다",type:"A"},
-{t:"나는 즐거운 분위기를 만든다",type:"FC"},
-{t:"나는 갈등을 피하려 한다",type:"AC"},
+["나는 책임감이 강하다","CP"],
+["나는 봉사활동에 참여하는 것이 즐겁다","NP"],
+["나는 계획을 세우고 나서 실행한다","A"],
+["나는 표현력이 풍부하고 농담 하기를 좋아한다","FC"],
+["나는 다른 사람의 안색을 살피며 눈치를 보는 편이다","AC"],
 
-{t:"나는 책임감이 강하다",type:"CP"},
-{t:"나는 봉사활동에 참여하는 것이 즐겁다",type:"NP"},
-{t:"나는 계획을 세우고 나서 실행한다",type:"A"},
-{t:"나는 표현력이 풍부하고 농담 하기를 좋아한다",type:"FC"},
-{t:"나는 다른 사람의 안색을 살피며 눈치를 보는 편이다",type:"AC"},
+["나는 말을 가로막고 내생각을 먼저 말할만큼 성격이 급하다","CP"],
+["나는 상대방의 이야기에 경청하고 공감 하기를 잘한다","NP"],
+["나는 육하원칙에 따라 사고 하고 설명한다","A"],
+["나는 와 멋있다. 우와, 등의 감탄사를 잘 쓴다","FC"],
+["나는 어떤 일을 할 때 적극적으로 나서지 못한다 편이다","AC"],
 
-{t:"나는 말을 가로막고 내생각을 먼저 말할만큼 성격이 급하다",type:"CP"},
-{t:"나는 상대방의 이야기에 경청하고 공감 하기를 잘한다",type:"NP"},
-{t:"나는 육하원칙에 따라 사고 하고 설명한다",type:"A"},
-{t:"나는 와 멋있다. 우와, 등의 감탄사를 잘 쓴다",type:"FC"},
-{t:"나는 어떤 일을 할 때 적극적으로 나서지 못한다 편이다",type:"AC"},
+["나는 반드시, 당연히 라는 말을 자주 사용한다","CP"],
+["나는 다른 사람에게 도움을 주는 것이 좋다","NP"],
+["나는 객관성을 유지하려 노력한다","A"],
+["나는 자유로운 감정 표현을 좋아한다","FC"],
+["나는 다른 사람에게 잘 맞춰주는 편이다","AC"],
 
-{t:"나는 반드시, 당연히 라는 말을 자주 사용한다",type:"CP"},
-{t:"나는 다른 사람에게 도움을 주는 것이 좋다",type:"NP"},
-{t:"나는 객관성을 유지하려 노력한다",type:"A"},
-{t:"나는 자유로운 감정 표현을 좋아한다",type:"FC"},
-{t:"나는 다른 사람에게 잘 맞춰주는 편이다",type:"AC"},
+["나는 옳고 그름을 분명히 한다","CP"],
+["나는 상냥하고 부드러운 태도로 상대를 대한다","NP"],
+["나는 데이터와 사실 중심으로 판단한다","A"],
+["나는 오락이나 술 등 음식물을 만족할 때까지 취한다","FC"],
+["나는 다른 사람의 부탁을 받으면 거절을 잘 못한다","AC"],
 
-{t:"나는 옳고 그름을 분명히 한다",type:"CP"},
-{t:"나는 상냥하고 부드러운 태도로 상대를 대한다",type:"NP"},
-{t:"나는 데이터와 사실 중심으로 판단한다",type:"A"},
-{t:"나는 오락이나 술 등 음식물을 만족할 때까지 취한다",type:"FC"},
-{t:"나는 다른 사람의 부탁을 받으면 거절을 잘 못한다",type:"AC"},
+["나는 상대방의 실수에 엄격하다","CP"],
+["나는 다른 사람을 비판하기 보다 칭찬을 주로 한다","NP"],
+["나는 분석적이고 합리적으로 판단한다","A"],
+["나는 장난스런 행동이나 농담을 잘한다","FC"],
+["나는 관계를 중요하게 생각한다","AC"],
 
-{t:"나는 상대방의 실수에 엄격하다",type:"CP"},
-{t:"나는 다른 사람을 비판하기 보다 칭찬을 주로 한다",type:"NP"},
-{t:"나는 분석적이고 합리적으로 판단한다",type:"A"},
-{t:"나는 장난스런 행동이나 농담을 잘한다",type:"FC"},
-{t:"나는 관계를 중요하게 생각한다",type:"AC"},
+["나는 ~~해, ~~하지 않으면 안돼 하는 표현을 자주 사용한다","CP"],
+["나는 상대를 이해하고 공감하려고 노력한다","NP"],
+["나는 정리 정돈을 잘하는 편이다","A"],
+["나는 노래 부르거나 춤추는 것을 좋아한다","FC"],
+["나는 후회하는 일에 대한 생각에 사로 잡힐 때가 있다","AC"],
 
-{t:"나는 ~~해, ~~하지 않으면 안돼 하는 표현을 자주 사용한다",type:"CP"},
-{t:"나는 상대를 이해하고 공감하려고 노력한다",type:"NP"},
-{t:"나는 정리 정돈을 잘하는 편이다",type:"A"},
-{t:"나는 노래 부르거나 춤추는 것을 좋아한다",type:"FC"},
-{t:"나는 후회하는 일에 대한 생각에 사로 잡힐 때가 있다",type:"AC"},
+["나는 반대에 부딪혀도 내 생각을 관철하는 편이다","CP"],
+["나는 격려와 위로를 잘 한다","NP"],
+["나는 미래에 대하여 철저하게 계획하고 행동한다","A"],
+["나는 즐거움을 추구한다","FC"],
+["나는 어떤 일을 할 때 좀처럼 결심을 할 수가 없다","AC"],
 
-{t:"나는 반대에 부딪혀도 내 생각을 관철하는 편이다",type:"CP"},
-{t:"나는 격려와 위로를 잘 한다",type:"NP"},
-{t:"나는 미래에 대하여 철저하게 계획하고 행동한다",type:"A"},
-{t:"나는 즐거움을 추구한다",type:"FC"},
-{t:"나는 어떤 일을 할 때 좀처럼 결심을 할 수가 없다",type:"AC"},
-
-{t:"나는 다른 사람의 장점보다 결점이 눈에 먼저 보안다",type:"CP"},
-{t:"나는 다른 사람에 대해 온화하고 관대하게 대한다",type:"NP"},
-{t:"나는 주로 숫자나 자료를 근거해서 이야기 한다",type:"A"},
-{t:"나는 내가 좋아하는 것과 싫어하는 것을 잘 알고 표현한다",type:"FC"},
-{t:"나는 내가 나서서 무엇을 하는 것보다 남이 시키는 것을 하는게 편하다",type:"AC"}
-
+["나는 다른 사람의 장점보다 결점이 눈에 먼저 보안다","CP"],
+["나는 다른 사람에 대해 온화하고 관대하게 대한다","NP"],
+["나는 주로 숫자나 자료를 근거해서 이야기 한다","A"],
+["나는 내가 좋아하는 것과 싫어하는 것을 잘 알고 표현한다","FC"],
+["나는 내가 나서서 무엇을 하는 것보다 남이 시키는 것을 하는게 편하다","AC"]
 ];
 
-const typeName = {
-CP:"통제의 언어",
-NP:"배려의 언어",
-A:"이성의 언어",
-FC:"표현의 언어",
-AC:"수용의 언어"
-};
-
+// 질문 출력
 const form = document.getElementById("quiz");
 
 questions.forEach((q,i)=>{
-let html = `<div class="question">${i+1}. ${q.t}<br>`;
+let html = `<div class="question">${i+1}. ${q[0]}<br>`;
 for(let j=5;j>=1;j--){
-html += `<label><input type="radio" name="q${i}" value="${j}">${j}</label> `;
+html += `<label>
+<input type="radio" name="q_${i}_${q[1]}" value="${j}">
+<span>${j}</span>
+</label>`;
 }
 html += "</div>";
 form.innerHTML += html;
 });
 
-function calculate(){
+// 결과 계산
+function showResult(){
 
 let score = {CP:0,NP:0,A:0,FC:0,AC:0};
 
-questions.forEach((q,i)=>{
-let val = document.querySelector(`input[name="q${i}"]:checked`);
-if(val) score[q.type]+=parseInt(val.value);
+const answers = document.querySelectorAll("input[type='radio']:checked");
+
+if(answers.length<50){
+alert("모든 문항에 응답해주세요");
+return;
+}
+
+answers.forEach(a=>{
+const type = a.name.split("_")[2];
+score[type]+=parseInt(a.value);
 });
 
-const sorted = Object.entries(score).sort((a,b)=>b[1]-a[1]);
-
-let resultText = `
-<h3>결과</h3>
-CP(통제): ${score.CP}<br>
-NP(배려): ${score.NP}<br>
-A(이성): ${score.A}<br>
-FC(표현): ${score.FC}<br>
-AC(수용): ${score.AC}<br><br>
-
-<b>주요 조합</b><br>
-1위: ${typeName[sorted[0][0]]}<br>
-2위: ${typeName[sorted[1][0]]}<br><br>
-
-<b>해석</b><br>
+// 결과 출력
+document.getElementById("result").innerHTML = `
+<h3>진단 결과</h3>
+CP: ${score.CP} / NP: ${score.NP} / A: ${score.A} / FC: ${score.FC} / AC: ${score.AC}
+<br><br>
+당신은 사람을 배려하고 관계를 중요하게 생각하는 성향이 강합니다.<br>
+자신의 감정을 비교적 잘 표현하며, 따뜻한 분위기를 만드는 데 강점이 있습니다.<br>
+주변 사람들에게 긍정적인 영향을 주는 유형입니다.<br>
+다만 감정에 치우쳐 판단하거나 자기 의견을 미루는 경향이 있을 수 있습니다.<br>
+균형을 위해 이성적 판단(A)을 함께 활용하는 것이 중요합니다.
 `;
-
-const combo = sorted[0][0] + "-" + sorted[1][0];
-
-const interpretation = {
-"CP-A":"원칙과 기준 + 논리 중심의 실행형 리더",
-"CP-NP":"엄격하지만 사람을 챙기는 보호형 리더",
-"A-CP":"분석과 기준 중심의 전략형",
-"NP-AC":"배려와 관계 중심의 안정형",
-"FC-NP":"따뜻하고 활발한 소통형",
-"FC-A":"감성과 논리가 균형잡힌 창의형",
-"AC-NP":"순응적이지만 관계를 중시하는 협력형"
-};
-
-resultText += interpretation[combo] || "전반적으로 균형 잡힌 성향입니다";
-
-document.getElementById("result").innerHTML = resultText;
 
 // 그래프
 new Chart(document.getElementById("chart"),{
 type:"bar",
 data:{
 labels:["CP","NP","A","FC","AC"],
-datasets:[{
-data:[score.CP,score.NP,score.A,score.FC,score.AC]
-}]
+datasets:[{data:[score.CP,score.NP,score.A,score.FC,score.AC]}]
 },
-options:{
-plugins:{legend:{display:false}},
-scales:{y:{beginAtZero:true}}
-}
+options:{plugins:{legend:{display:false}}}
 });
 
 // 구글 전송
