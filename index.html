@@ -7,17 +7,17 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #4CAF50; --dark: #2c3e50; --bg: #f4f7f6; }
-        body { font-family: 'Pretendard', sans-serif; background: var(--bg); padding: 20px; max-width: 800px; margin: 0 auto; color: #333; line-height: 1.6; }
+        body { font-family: sans-serif; background: var(--bg); padding: 20px; max-width: 800px; margin: 0 auto; color: #333; line-height: 1.6; }
         
         /* 상단 가이드 영역 */
         .guide-box { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
         .guide-box h2 { text-align: center; color: var(--dark); margin-top: 0; }
         
-        /* 문항 카드 디자인 */
+        /* 문항 카드 */
         .question-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
         .question-title { font-weight: bold; font-size: 1.05rem; display: block; margin-bottom: 15px; color: #444; }
 
-        /* 점수 선택 버튼 (1~5 정순) */
+        /* 점수 선택 버튼 (개선: 1~5 정순) */
         .options { display: flex; gap: 8px; }
         .options label { flex: 1; cursor: pointer; }
         .options input { display: none; }
@@ -31,7 +31,7 @@
             box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
         }
 
-        /* 큰 사각형 진단 버튼 */
+        /* 개선: 큰 사각형 결과 보기 버튼 */
         .submit-btn { 
             width: 100%; padding: 20px; background: var(--dark); color: white; 
             border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; 
@@ -39,7 +39,6 @@
         }
         .submit-btn:hover { background: #1a252f; }
 
-        /* 결과 영역 */
         #result { display: none; background: white; padding: 30px; border-radius: 15px; border: 2px solid var(--primary); margin-top: 20px; }
         canvas { background: white; border-radius: 15px; padding: 15px; margin-top: 20px; }
         
@@ -85,7 +84,6 @@ const form = document.getElementById("quiz");
 let htmlContent = "";
 
 questions.forEach((q, i) => {
-    // 1~5 정순 정렬
     htmlContent += `
     <div class="question-card">
         <span class="question-title">${i + 1}. ${q[0]}</span>
@@ -115,7 +113,6 @@ function showResult() {
         score[type] += parseInt(s.value);
     });
 
-    // 결과 출력 (문구 유지)
     const resDiv = document.getElementById("result");
     resDiv.style.display = "block";
     resDiv.innerHTML = `
