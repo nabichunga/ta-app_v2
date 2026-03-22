@@ -59,7 +59,7 @@
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbyGWV48MwQASq_BSxUJkcO-O9kmwyi6nu0ZUsfU98lgXdta81Hnn9v12PXnoOBeSmuK/exec";
 
-// ✅ 50개 문항 전체 (누락 없음)
+// ✅ 문항 50개 전체 (절대 변경 없음)
 const questions = [
     ["나는 규칙과 기준을 지키는 것을 중요하게 생각한다","CP"], ["나는 나보다 다른 사람을 먼저 배려하려 한다","NP"], ["나는 말과 행동을 할 때 냉정하고 침착하게 한다","A"], ["나는 감정을 솔직하게 표현한다","FC"], ["나는 다른 사람 기대에 맞추려 한다","AC"],
     ["나는 어떤 사건에 대해 잘 잘못을 가리지 않으면 마음이 편치 않다","CP"], ["나는 사람을 챙기는 편이다","NP"], ["나는 논리적이고 객관성을 유지하려고 한다","A"], ["나는 즐거운 분위기를 만든다","FC"], ["나는 갈등을 피하려 한다","AC"],
@@ -95,6 +95,8 @@ function showResult() {
 
     const resDiv = document.getElementById("result");
     resDiv.style.display = "block";
+    
+    // ⭐ 점수 표기 & 해석 완벽 수정
     resDiv.innerHTML = `
         <h3 style="margin-top:0; border-bottom:2px solid #eee; padding-bottom:10px;">진단 결과 분석</h3>
         <p style="font-size:1.1rem; line-height:1.8;">
