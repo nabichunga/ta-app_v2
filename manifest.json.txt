@@ -1,0 +1,8 @@
+{
+  "name": "TA 자아상태 진단",
+  "short_name": "TA 진단",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2c3e50"
+}
