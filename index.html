@@ -119,13 +119,14 @@ function showResult() {
     const resDiv = document.getElementById("result");
     resDiv.style.display = "block";
     
-    // 결과 텍스트 용어 수정 적용
+    // 결과 텍스트 용어 수정 적용   
     resDiv.innerHTML = `
         <h3 style="margin-top:0; border-bottom:2px solid #eee; padding-bottom:10px;">진단 결과 분석</h3>
         <p style="font-size:1.1rem; line-height:1.8;">
             <b>통제의 언어:</b> ${score.CP} / <b>배려의 언어:</b> ${score.NP} / <b>합리적 언어:</b> ${score.A} <br>
             <b>표현의 언어:</b> ${score.FC} / <b>수용의 언어:</b> ${score.AC}
         </p>
+    `;
         <div style="background:#f9f9f9; padding:15px; border-radius:10px; margin-top:15px;">
             당신은 사람을 배려하고 관계를 중요하게 생각하는 성향이 강합니다.<br>
             자신의 감정을 비교적 잘 표현하며, 따뜻한 분위기를 만드는 데 강점이 있습니다.<br>
