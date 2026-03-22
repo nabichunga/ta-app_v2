@@ -1,8 +1,22 @@
 {
-  "name": "TA 자아상태 진단",
+  "name": "TA 자아 상태 진단",
   "short_name": "TA 진단",
-  "start_url": ".",
+  "description": "교류분석(TA)을 통한 자아 상태 진단 서비스",
+  "start_url": "/ta-app_v2/index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
-  "theme_color": "#2c3e50"
+  "theme_color": "#2c3e50",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
