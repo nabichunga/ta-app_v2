@@ -40,81 +40,80 @@ button { padding:10px 20px; margin-top:20px; }
 <hr>
 
 <form id="quiz"></form>
-
 <button onclick="calculate()">결과 보기</button>
 
 <div id="result"></div>
-
 <canvas id="chart"></canvas>
 
 <script>
 
 const scriptURL = "https://script.google.com/macros/s/AKfycbyGWV48MwQASq_BSxUJkcO-O9kmwyi6nu0ZUsfU98lgXdta81Hnn9v12PXnoOBeSmuK/exec";
 
-// 50문항 + 유형 매칭 (중요 핵심)
+// ⭐ 문장 그대로 사용 + 유형 재배치 완료
 const questions = [
+
 {t:"나는 규칙과 기준을 지키는 것을 중요하게 생각한다",type:"CP"},
 {t:"나는 나보다 다른 사람을 먼저 배려하려 한다",type:"NP"},
 {t:"나는 말과 행동을 할 때 냉정하고 침착하게 한다",type:"A"},
 {t:"나는 감정을 솔직하게 표현한다",type:"FC"},
 {t:"나는 다른 사람 기대에 맞추려 한다",type:"AC"},
 
-{t:"나는 어떤 사건에 대해 잘잘못을 가리지 않으면 마음이 불편하다",type:"CP"},
+{t:"나는 어떤 사건에대해 잘 잘못을 가리지 않으면 마음이 편치 않다",type:"CP"},
 {t:"나는 사람을 챙기는 편이다",type:"NP"},
 {t:"나는 논리적이고 객관성을 유지하려고 한다",type:"A"},
 {t:"나는 즐거운 분위기를 만든다",type:"FC"},
 {t:"나는 갈등을 피하려 한다",type:"AC"},
 
 {t:"나는 책임감이 강하다",type:"CP"},
-{t:"나는 봉사활동이 즐겁다",type:"NP"},
-{t:"나는 계획 후 실행한다",type:"A"},
-{t:"나는 농담을 좋아한다",type:"FC"},
-{t:"나는 눈치를 보는 편이다",type:"AC"},
+{t:"나는 봉사활동에 참여하는 것이 즐겁다",type:"NP"},
+{t:"나는 계획을 세우고 나서 실행한다",type:"A"},
+{t:"나는 표현력이 풍부하고 농담 하기를 좋아한다",type:"FC"},
+{t:"나는 다른 사람의 안색을 살피며 눈치를 보는 편이다",type:"AC"},
 
-{t:"나는 성격이 급하다",type:"CP"},
-{t:"나는 공감과 경청을 잘한다",type:"NP"},
-{t:"나는 논리적으로 설명한다",type:"A"},
-{t:"나는 감탄사를 잘 쓴다",type:"FC"},
-{t:"나는 소극적이다",type:"AC"},
+{t:"나는 말을 가로막고 내생각을 먼저 말할만큼 성격이 급하다",type:"CP"},
+{t:"나는 상대방의 이야기에 경청하고 공감 하기를 잘한다",type:"NP"},
+{t:"나는 육하원칙에 따라 사고 하고 설명한다",type:"A"},
+{t:"나는 와 멋있다. 우와, 등의 감탄사를 잘 쓴다",type:"FC"},
+{t:"나는 어떤 일을 할 때 적극적으로 나서지 못한다 편이다",type:"AC"},
 
-{t:"나는 반드시라는 표현을 자주 쓴다",type:"CP"},
-{t:"나는 도움 주는 것을 좋아한다",type:"NP"},
-{t:"나는 객관성 유지 노력한다",type:"A"},
-{t:"나는 자유로운 표현을 좋아한다",type:"FC"},
-{t:"나는 맞춰주는 편이다",type:"AC"},
+{t:"나는 반드시, 당연히 라는 말을 자주 사용한다",type:"CP"},
+{t:"나는 다른 사람에게 도움을 주는 것이 좋다",type:"NP"},
+{t:"나는 객관성을 유지하려 노력한다",type:"A"},
+{t:"나는 자유로운 감정 표현을 좋아한다",type:"FC"},
+{t:"나는 다른 사람에게 잘 맞춰주는 편이다",type:"AC"},
 
 {t:"나는 옳고 그름을 분명히 한다",type:"CP"},
-{t:"나는 부드럽게 대한다",type:"NP"},
-{t:"나는 데이터 중심이다",type:"A"},
+{t:"나는 상냥하고 부드러운 태도로 상대를 대한다",type:"NP"},
+{t:"나는 데이터와 사실 중심으로 판단한다",type:"A"},
+{t:"나는 오락이나 술 등 음식물을 만족할 때까지 취한다",type:"FC"},
+{t:"나는 다른 사람의 부탁을 받으면 거절을 잘 못한다",type:"AC"},
+
+{t:"나는 상대방의 실수에 엄격하다",type:"CP"},
+{t:"나는 다른 사람을 비판하기 보다 칭찬을 주로 한다",type:"NP"},
+{t:"나는 분석적이고 합리적으로 판단한다",type:"A"},
+{t:"나는 장난스런 행동이나 농담을 잘한다",type:"FC"},
+{t:"나는 관계를 중요하게 생각한다",type:"AC"},
+
+{t:"나는 ~~해, ~~하지 않으면 안돼 하는 표현을 자주 사용한다",type:"CP"},
+{t:"나는 상대를 이해하고 공감하려고 노력한다",type:"NP"},
+{t:"나는 정리 정돈을 잘하는 편이다",type:"A"},
+{t:"나는 노래 부르거나 춤추는 것을 좋아한다",type:"FC"},
+{t:"나는 후회하는 일에 대한 생각에 사로 잡힐 때가 있다",type:"AC"},
+
+{t:"나는 반대에 부딪혀도 내 생각을 관철하는 편이다",type:"CP"},
+{t:"나는 격려와 위로를 잘 한다",type:"NP"},
+{t:"나는 미래에 대하여 철저하게 계획하고 행동한다",type:"A"},
 {t:"나는 즐거움을 추구한다",type:"FC"},
-{t:"나는 거절을 잘 못한다",type:"AC"},
+{t:"나는 어떤 일을 할 때 좀처럼 결심을 할 수가 없다",type:"AC"},
 
-{t:"나는 실수에 엄격하다",type:"CP"},
-{t:"나는 칭찬을 잘한다",type:"NP"},
-{t:"나는 분석적이다",type:"A"},
-{t:"나는 장난을 잘한다",type:"FC"},
-{t:"나는 관계를 중요시한다",type:"AC"},
+{t:"나는 다른 사람의 장점보다 결점이 눈에 먼저 보안다",type:"CP"},
+{t:"나는 다른 사람에 대해 온화하고 관대하게 대한다",type:"NP"},
+{t:"나는 주로 숫자나 자료를 근거해서 이야기 한다",type:"A"},
+{t:"나는 내가 좋아하는 것과 싫어하는 것을 잘 알고 표현한다",type:"FC"},
+{t:"나는 내가 나서서 무엇을 하는 것보다 남이 시키는 것을 하는게 편하다",type:"AC"}
 
-{t:"나는 강한 표현을 자주 쓴다",type:"CP"},
-{t:"나는 공감하려 노력한다",type:"NP"},
-{t:"나는 정리정돈 잘한다",type:"A"},
-{t:"나는 춤과 노래 좋아한다",type:"FC"},
-{t:"나는 후회에 머문다",type:"AC"},
-
-{t:"나는 내 생각을 관철한다",type:"CP"},
-{t:"나는 위로를 잘한다",type:"NP"},
-{t:"나는 미래 계획 철저하다",type:"A"},
-{t:"나는 재미를 추구한다",type:"FC"},
-{t:"나는 결정을 잘 못한다",type:"AC"},
-
-{t:"나는 단점이 먼저 보인다",type:"CP"},
-{t:"나는 관대하다",type:"NP"},
-{t:"나는 자료 중심으로 말한다",type:"A"},
-{t:"나는 감정 표현을 잘 안다",type:"FC"},
-{t:"나는 지시받는 것이 편하다",type:"AC"}
 ];
 
-// 유형 이름
 const typeName = {
 CP:"통제의 언어",
 NP:"배려의 언어",
@@ -123,12 +122,10 @@ FC:"표현의 언어",
 AC:"수용의 언어"
 };
 
-// 질문 출력
 const form = document.getElementById("quiz");
 
 questions.forEach((q,i)=>{
-let html = `<div class="question">
-${i+1}. ${q.t}<br>`;
+let html = `<div class="question">${i+1}. ${q.t}<br>`;
 for(let j=5;j>=1;j--){
 html += `<label><input type="radio" name="q${i}" value="${j}">${j}</label> `;
 }
@@ -155,7 +152,7 @@ A(이성): ${score.A}<br>
 FC(표현): ${score.FC}<br>
 AC(수용): ${score.AC}<br><br>
 
-<b>주요 유형</b><br>
+<b>주요 조합</b><br>
 1위: ${typeName[sorted[0][0]]}<br>
 2위: ${typeName[sorted[1][0]]}<br><br>
 
@@ -165,13 +162,16 @@ AC(수용): ${score.AC}<br><br>
 const combo = sorted[0][0] + "-" + sorted[1][0];
 
 const interpretation = {
-"CP-A":"원칙과 논리를 중시하는 리더형",
-"NP-AC":"배려와 관계 중심형",
+"CP-A":"원칙과 기준 + 논리 중심의 실행형 리더",
+"CP-NP":"엄격하지만 사람을 챙기는 보호형 리더",
+"A-CP":"분석과 기준 중심의 전략형",
+"NP-AC":"배려와 관계 중심의 안정형",
 "FC-NP":"따뜻하고 활발한 소통형",
-"A-CP":"분석과 기준 중심형"
+"FC-A":"감성과 논리가 균형잡힌 창의형",
+"AC-NP":"순응적이지만 관계를 중시하는 협력형"
 };
 
-resultText += interpretation[combo] || "균형 잡힌 유형입니다";
+resultText += interpretation[combo] || "전반적으로 균형 잡힌 성향입니다";
 
 document.getElementById("result").innerHTML = resultText;
 
@@ -190,7 +190,7 @@ scales:{y:{beginAtZero:true}}
 }
 });
 
-// Google 전송
+// 구글 전송
 fetch(scriptURL,{
 method:"POST",
 body:JSON.stringify(score)
