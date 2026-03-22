@@ -8,46 +8,31 @@
     <style>
         :root { --primary: #4CAF50; --dark: #2c3e50; --bg: #f4f7f6; }
         body { font-family: 'Pretendard', sans-serif; background: var(--bg); padding: 20px; max-width: 800px; margin: 0 auto; color: #333; line-height: 1.6; }
-        
-        /* 상단 가이드 영역 */
         .guide-box { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
         .guide-box h2 { text-align: center; color: var(--dark); margin-top: 0; }
-        
-        /* 문항 카드 */
         .question-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
         .question-title { font-weight: bold; font-size: 1.05rem; display: block; margin-bottom: 15px; color: #444; }
-
-        /* 점수 선택 버튼 (1~5 정순) */
         .options { display: flex; gap: 8px; }
         .options label { flex: 1; cursor: pointer; }
         .options input { display: none; }
         .options span { 
             display: flex; justify-content: center; align-items: center; 
             height: 55px; border: 1px solid #ddd; border-radius: 8px; 
-            background: #fff; font-weight: bold; transition: 0.2s; color: #666;
-            font-size: 1.1rem;
+            background: #fff; font-weight: bold; transition: 0.2s; color: #666; font-size: 1.1rem;
         }
         .options input:checked + span { 
             background: var(--primary); color: white; border-color: var(--primary); 
             box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
         }
-
-        /* 큰 사각형 결과 보기 버튼 */
         .submit-btn { 
             width: 100%; padding: 22px; background: var(--dark); color: white; 
-            border: none; border-radius: 8px; font-size: 1.3rem; font-weight: bold; 
+            border: none; border-radius: 10px; font-size: 1.3rem; font-weight: bold; 
             cursor: pointer; margin: 40px 0; transition: background 0.3s;
         }
         .submit-btn:hover { background: #1a252f; }
-
-        /* 결과 영역 */
         #result { display: none; background: white; padding: 30px; border-radius: 15px; border: 2px solid var(--primary); margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         canvas { background: white; border-radius: 15px; padding: 15px; margin-top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        
-        @media (max-width: 600px) {
-            .options span { height: 50px; font-size: 16px; }
-            .submit-btn { padding: 18px; font-size: 1.1rem; }
-        }
+        @media (max-width: 600px) { .options span { height: 50px; font-size: 16px; } .submit-btn { padding: 18px; font-size: 1.1rem; } }
     </style>
 </head>
 <body>
@@ -58,29 +43,34 @@
     • 검사명: TA 자아 상태 진단<br>
     • 문항 수: 50문항<br>
     • 소요시간: 약 10분<br><br>
-
     <b>응답 방법</b><br>
     각 문항을 읽고 해당되는 정도를 선택하세요<br><br>
-
     5점 척도<br>
     5 매우 그렇다 / 4 그렇다 / 3 보통 / 2 그렇치 않다 / 1 전혀 그렇치 않다<br><br>
-
     <b>유의사항</b><br>
     - 실제 모습 기준으로 응답하세요
 </div>
 
 <form id="quiz"></form>
-
 <button class="submit-btn" onclick="showResult()">결과 분석하기</button>
-
 <div id="result"></div>
 <canvas id="chart" style="display:none;"></canvas>
 
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbyGWV48MwQASq_BSxUJkcO-O9kmwyi6nu0ZUsfU98lgXdta81Hnn9v12PXnoOBeSmuK/exec";
 
+// ✅ 50개 문항 전체 (누락 없음)
 const questions = [
-    ["나는 규칙과 기준을 지키는 것을 중요하게 생각한다","CP"], ["나는 나보다 다른 사람을 먼저 배려하려 한다","NP"], ["나는 말과 행동을 할 때 냉정하고 침착하게 한다","A"], ["나는 감정을 솔직하게 표현한다","FC"], ["나는 다른 사람 기대에 맞추려 한다","AC"], ["나는 어떤 사건에 대해 잘 잘못을 가리지 않으면 마음이 편치 않다","CP"], ["나는 사람을 챙기는 편이다","NP"], ["나는 논리적이고 객관성을 유지하려고 한다","A"], ["나는 즐거운 분위기를 만든다","FC"], ["나는 갈등을 피하려 한다","AC"], ["나는 책임감이 강하다","CP"], ["나는 봉사활동에 참여하는 것이 즐겁다","NP"], ["나는 계획을 세우고 나서 실행한다","A"], ["나는 표현력이 풍부하고 농담 하기를 좋아한다","FC"], ["나는 다른 사람의 안색을 살피며 눈치를 보는 편이다","AC"], ["나는 말을 가로막고 내생각을 먼저 말할만큼 성격이 급하다","CP"], ["나는 상대방의 이야기에 경청하고 공감을 잘한다","NP"], ["나는 육하원칙에 따라 생각하고 설명한다","A"], ["나는 와 멋있다. 우와, 등의 감탄사를 잘 쓴다","FC"], ["나는 어떤 일을 할 때 적극적으로 나서지 못하는 편이다","AC"], ["나는 반드시, 당연히 라는 말을 자주 사용한다","CP"], ["나는 다른 사람에게 도움을 주는 것이 좋다","NP"], ["나는 객관성을 유지하려 노력한다","A"], ["나는 자유로운 감정 표현을 좋아한다","FC"], ["나는 다른 사람에게 잘 맞춰주는 편이다","AC"], ["나는 옳고 그름을 분명히 한다","CP"], ["나는 상냥하고 부드러운 태도로 상대를 대한다","NP"], ["나는 데이터와 사실 중심으로 판단한다","A"], ["나는 오락이나 술 등 음식물을 만족할 때까지 취한다","FC"], ["나는 다른 사람의 부탁을 받으면 거절을 잘 못한다","AC"], ["나는 상대방의 실수에 엄격하다","CP"], ["나는 다른 사람을 비판하기 보다 칭찬을 주로 한다","NP"], ["나는 분석적이고 합리적으로 판단한다","A"], ["나는 장난스런 행동이나 농담을 잘한다","FC"], ["나는 관계를 중요하게 생각한다","AC"], ["나는 ~~해, ~~하지 않으면 안돼 하는 표현을 자주 사용한다","CP"], ["나는 상대를 이해하고 공감하려고 노력한다","NP"], ["나는 정리 정돈을 잘하는 편이다","A"], ["나는 노래 부르거나 춤추는 것을 좋아한다","FC"], ["나는 후회하는 일에 대한 생각에 사로 잡힐 때가 있다","AC"], ["나는 반대에 부딪혀도 내 생각을 관철하는 편이다","CP"], ["나는 격려와 위로를 잘 한다","NP"], ["나는 미래에 대하여 철저하게 계획하고 행동한다","A"], ["나는 즐거움을 추구한다","FC"], ["나는 어떤 일을 할 때 좀처럼 결심을 할 수가 없다","AC"], ["나는 다른 사람의 장점보다 결점이 눈에 먼저 보인다","CP"], ["나는 다른 사람에 대해 온화하고 관대하게 대한다","NP"], ["나는 주로 숫자나 자료를 근거해서 이야기 한다","A"], ["나는 내가 좋아하는 것과 싫어하는 것을 잘 알고 표현한다","FC"], ["나는 내가 나서서 무엇을 하는 것보다 남이 시키는 것을 하는게 편하다","AC"]
+    ["나는 규칙과 기준을 지키는 것을 중요하게 생각한다","CP"], ["나는 나보다 다른 사람을 먼저 배려하려 한다","NP"], ["나는 말과 행동을 할 때 냉정하고 침착하게 한다","A"], ["나는 감정을 솔직하게 표현한다","FC"], ["나는 다른 사람 기대에 맞추려 한다","AC"],
+    ["나는 어떤 사건에 대해 잘 잘못을 가리지 않으면 마음이 편치 않다","CP"], ["나는 사람을 챙기는 편이다","NP"], ["나는 논리적이고 객관성을 유지하려고 한다","A"], ["나는 즐거운 분위기를 만든다","FC"], ["나는 갈등을 피하려 한다","AC"],
+    ["나는 책임감이 강하다","CP"], ["나는 봉사활동에 참여하는 것이 즐겁다","NP"], ["나는 계획을 세우고 나서 실행한다","A"], ["나는 표현력이 풍부하고 농담 하기를 좋아한다","FC"], ["나는 다른 사람의 안색을 살피며 눈치를 보는 편이다","AC"],
+    ["나는 말을 가로막고 내생각을 먼저 말할만큼 성격이 급하다","CP"], ["나는 상대방의 이야기에 경청하고 공감을 잘한다","NP"], ["나는 육하원칙에 따라 생각하고 설명한다","A"], ["나는 와 멋있다. 우와, 등의 감탄사를 잘 쓴다","FC"], ["나는 어떤 일을 할 때 적극적으로 나서지 못하는 편이다","AC"],
+    ["나는 반드시, 당연히 라는 말을 자주 사용한다","CP"], ["나는 다른 사람에게 도움을 주는 것이 좋다","NP"], ["나는 객관성을 유지하려 노력한다","A"], ["나는 자유로운 감정 표현을 좋아한다","FC"], ["나는 다른 사람에게 잘 맞춰주는 편이다","AC"],
+    ["나는 옳고 그름을 분명히 한다","CP"], ["나는 상냥하고 부드러운 태도로 상대를 대한다","NP"], ["나는 데이터와 사실 중심으로 판단한다","A"], ["나는 오락이나 술 등 음식물을 만족할 때까지 취한다","FC"], ["나는 다른 사람의 부탁을 받으면 거절을 잘 못한다","AC"],
+    ["나는 상대방의 실수에 엄격하다","CP"], ["나는 다른 사람을 비판하기 보다 칭찬을 주로 한다","NP"], ["나는 분석적이고 합리적으로 판단한다","A"], ["나는 장난스런 행동이나 농담을 잘한다","FC"], ["나는 관계를 중요하게 생각한다","AC"],
+    ["나는 ~~해, ~~하지 않으면 안돼 하는 표현을 자주 사용한다","CP"], ["나는 상대를 이해하고 공감하려고 노력한다","NP"], ["나는 정리 정돈을 잘하는 편이다","A"], ["나는 노래 부르거나 춤추는 것을 좋아한다","FC"], ["나는 후회하는 일에 대한 생각에 사로 잡힐 때가 있다","AC"],
+    ["나는 반대에 부딪혀도 내 생각을 관철하는 편이다","CP"], ["나는 격려와 위로를 잘 한다","NP"], ["나는 미래에 대하여 철저하게 계획하고 행동한다","A"], ["나는 즐거움을 추구한다","FC"], ["나는 어떤 일을 할 때 좀처럼 결심을 할 수가 없다","AC"],
+    ["나는 다른 사람의 장점보다 결점이 눈에 먼저 보인다","CP"], ["나는 다른 사람에 대해 온화하고 관대하게 대한다","NP"], ["나는 주로 숫자나 자료를 근거해서 이야기 한다","A"], ["나는 내가 좋아하는 것과 싫어하는 것을 잘 알고 표현한다","FC"], ["나는 내가 나서서 무엇을 하는 것보다 남이 시키는 것을 하는게 편하다","AC"]
 ];
 
 const form = document.getElementById("quiz");
@@ -90,12 +80,7 @@ questions.forEach((q, i) => {
     <div class="question-card">
         <span class="question-title">${i + 1}. ${q[0]}</span>
         <div class="options">
-            ${[1, 2, 3, 4, 5].map(num => `
-                <label>
-                    <input type="radio" name="q_${i}_${q[1]}" value="${num}">
-                    <span>${num}</span>
-                </label>
-            `).join('')}
+            ${[1, 2, 3, 4, 5].map(num => `<label><input type="radio" name="q_${i}_${q[1]}" value="${num}"><span>${num}</span></label>`).join('')}
         </div>
     </div>`;
 });
@@ -104,21 +89,12 @@ form.innerHTML = htmlContent;
 function showResult() {
     let score = {CP: 0, NP: 0, A: 0, FC: 0, AC: 0};
     const selected = document.querySelectorAll("input[type='radio']:checked");
+    if (selected.length < 50) { alert("모든 문항에 응답해주세요. 현재 " + selected.length + "개 응답함."); return; }
 
-    if (selected.length < 50) {
-        alert("모든 문항에 응답해주세요. 현재 " + selected.length + "개 응답함.");
-        return;
-    }
-
-    selected.forEach(s => {
-        const type = s.name.split("_")[2];
-        score[type] += parseInt(s.value);
-    });
+    selected.forEach(s => { const type = s.name.split("_")[2]; score[type] += parseInt(s.value); });
 
     const resDiv = document.getElementById("result");
     resDiv.style.display = "block";
-    
-    // ⭐ 오류 수정: 하나로 합쳐진 완벽한 결과 텍스트
     resDiv.innerHTML = `
         <h3 style="margin-top:0; border-bottom:2px solid #eee; padding-bottom:10px;">진단 결과 분석</h3>
         <p style="font-size:1.1rem; line-height:1.8;">
@@ -126,11 +102,8 @@ function showResult() {
             <b>표현의 언어:</b> ${score.FC} / <b>수용의 언어:</b> ${score.AC}
         </p>
         <div style="background:#f9f9f9; padding:15px; border-radius:10px; margin-top:15px; font-size:0.95rem;">
-            당신은 사람을 배려하고 관계를 중요하게 생각하는 성향이 강합니다.<br>
-            자신의 감정을 비교적 잘 표현하며, 따뜻한 분위기를 만드는 데 강점이 있습니다.<br>
-            주변 사람들에게 긍정적인 영향을 주는 유형입니다.<br>
-            다만 감정에 치우쳐 판단하거나 자기 의견을 미루는 경향이 있을 수 있습니다.<br>
-            균형을 위해 <b>이성적 판단(합리적 언어)</b>을 함께 활용하는 것이 중요합니다.
+            당신은 사람을 배려하고 관계를 중요하게 생각하는 성향이 강합니다. 자신의 감정을 비교적 잘 표현하며, 따뜻한 분위기를 만드는 데 강점이 있습니다. 주변 사람들에게 긍정적인 영향을 주는 유형입니다.<br><br>
+            다만 감정에 치우쳐 판단하거나 자기 의견을 미루는 경향이 있을 수 있습니다. 균형을 위해 <b>이성적 판단(합리적 언어)</b>을 함께 활용하는 것이 중요합니다.
         </div>
     `;
 
@@ -148,10 +121,7 @@ function showResult() {
                 backgroundColor: ['#FF6B6B', '#4D96FF', '#6BCB77', '#FFD93D', '#6E85B7']
             }]
         },
-        options: { 
-            plugins: { legend: { display: false } }, 
-            scales: { y: { beginAtZero: true, max: 50 } } 
-        }
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 50 } } }
     });
 
     fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(score) });
