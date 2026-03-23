@@ -69,7 +69,6 @@
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbyh1swBDkYzJjBMVUC7TH-38G_gi5HrcEipMo7Ck5RylSgldJYwhPyRzuq35wPJa7vSPQ/exec";
 
-// 문항 및 자아상태 매핑 (한글 키워드로 변경)
 const questions = [
     ["나는 규칙과 기준을 지키는 것을 중요하게 생각한다","통제의언어"], ["나는 나보다 다른 사람을 먼저 배려하려 한다","배려의언어"], ["나는 말과 행동을 할 때 냉정하고 침착하게 한다","합리적언어"], ["나는 감정을 솔직하게 표현한다","표현의언어"], ["나는 다른 사람 기대에 맞추려 한다","수용의언어"],
     ["나는 어떤 사건에 대해 잘 잘못을 가리지 않으면 마음이 편치 않다","통제의언어"], ["나는 사람을 챙기는 편이다","배려의언어"], ["나는 논리적이고 객관성을 유지하려고 한다","합리적언어"], ["나는 즐거운 분위기를 만든다","표현의언어"], ["나는 갈등을 피하려 한다","수용의언어"],
@@ -103,18 +102,16 @@ function showResult() {
     const selected = document.querySelectorAll("input[type='radio']:checked");
     if (selected.length < 50) { alert("모든 문항에 응답해주세요. 현재 " + selected.length + "개 응답함."); return; }
 
-    // 점수 초기화 (한글 키워드)
     let score = {name: nameInput, 통제의언어: 0, 배려의언어: 0, 합리적언어: 0, 표현의언어: 0, 수용의언어: 0};
     selected.forEach(s => { const type = s.name.split("_")[2]; score[type] += parseInt(s.value); });
 
-    // 분석 해설 생성 로직
     let analysisMsg = "";
     if (score.배려의언어 >= 35 && score.표현의언어 >= 30) {
         analysisMsg = "당신은 사람을 배려하고 관계를 중요하게 생각하는 따뜻한 소통가입니다. 즐거운 분위기를 만드는 데 강점이 있으며 주변에 긍정적인 에너지를 전달합니다. 다만 가끔은 자신의 논리적인 판단(합리적 언어)을 믿고 추진해 보세요.";
     } else if (score.합리적언어 >= 35) {
         analysisMsg = "매우 분석적이고 합리적인 사고를 가진 문제 해결사 타입입니다. 사실과 데이터를 기반으로 상황을 파악하는 능력이 탁월합니다. 상대방의 감정을 읽어주는 배려의 언어를 더해주신다면 완벽한 소통가가 되실 거예요.";
     } else if (score.통제의언어 >= 35) {
-        analysisMsg = "명확한 주관과 도덕적 기준을 가진 리더십이 돋보입니다. 책임감이 강하고 질서를 중시하는 추진력이 큰 강점입니다. 타인에게 조금 더 관대한 태도와 자유로운 표현을 허용한다면 더욱 유연한 관계를 맺을 수 있습니다.";
+        analysisMsg = "명확한 주관과 도덕적 기준을 가진 리더십이 돋보입니다. 책임감이 강하고 질서를 중시하는 추진력이 큰 강점입니다. 타인에게 조금 더 관대한 태도와 자유로운 표현의 언어를 허용한다면 더욱 유연한 관계를 맺을 수 있습니다.";
     } else {
         analysisMsg = "전체적으로 균형 잡힌 자아 상태를 유지하고 계십니다. 상황에 맞춰 적절한 자아를 활용하는 유연성이 돋보이네요. 현재의 강점을 살리면서 자신이 더 개발하고 싶은 부분을 의식적으로 연습해 보시기 바랍니다.";
     }
@@ -123,9 +120,9 @@ function showResult() {
     resDiv.style.display = "block";
     resDiv.innerHTML = `
         <h3 style="margin:0 0 15px 0; border-bottom:2px solid #eee; padding-bottom:10px;">${nameInput} 님의 진단 결과</h3>
-        <p style="font-size:1.1rem; line-height:1.6; color:var(--dark);">
-            통제: ${score.통제의 언어} / 배려: ${score.배려의 언어} / 합리: ${score.합리적 언어} <br>
-            표현: ${score.표현의 언어} / 수용: ${score.수용의 언어}
+        <p style="font-size:1.1rem; line-height:1.8; color:var(--dark);">
+            통제의 언어: ${score.통제의언어} / 배려의 언어: ${score.배려의언어} / 합리적 언어: ${score.합리적언어} <br>
+            표현의 언어: ${score.표현의언어} / 수용의 언어: ${score.수용의언어}
         </p>
         <div class="analysis-box">
             <strong>[전문가 분석 결과]</strong><br>
@@ -143,14 +140,13 @@ function showResult() {
         data: {
             labels: ["통제의 언어", "배려의 언어", "합리적 언어", "표현의 언어", "수용의 언어"],
             datasets: [{
-                data: [score.통제의 언어, score.배려의 언어, score.합리적 언어, score.표현의 언어, score.수용의 언어],
+                data: [score.통제의언어, score.배려의언어, score.합리적언어, score.표현의언어, score.수용의언어],
                 backgroundColor: ['#FF6B6B', '#4D96FF', '#6BCB77', '#FFD93D', '#6E85B7']
             }]
         },
         options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 50 } } }
     });
 
-    // 구글 시트로 데이터 전송
     fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(score) });
     window.scrollTo({ top: resDiv.offsetTop - 20, behavior: 'smooth' });
 }
