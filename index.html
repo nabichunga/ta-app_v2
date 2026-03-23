@@ -124,8 +124,8 @@ function showResult() {
     resDiv.innerHTML = `
         <h3 style="margin:0 0 15px 0; border-bottom:2px solid #eee; padding-bottom:10px;">${nameInput} 님의 진단 결과</h3>
         <p style="font-size:1.1rem; line-height:1.6; color:var(--dark);">
-            통제: ${score.통제의언어} / 배려: ${score.배려의언어} / 합리: ${score.합리적언어} <br>
-            표현: ${score.표현의언어} / 수용: ${score.수용의언어}
+            통제: ${score.통제의 언어} / 배려: ${score.배려의 언어} / 합리: ${score.합리적 언어} <br>
+            표현: ${score.표현의 언어} / 수용: ${score.수용의 언어}
         </p>
         <div class="analysis-box">
             <strong>[전문가 분석 결과]</strong><br>
@@ -143,7 +143,7 @@ function showResult() {
         data: {
             labels: ["통제의 언어", "배려의 언어", "합리적 언어", "표현의 언어", "수용의 언어"],
             datasets: [{
-                data: [score.통제의언어, score.배려의언어, score.합리적언어, score.표현의언어, score.수용의언어],
+                data: [score.통제의 언어, score.배려의 언어, score.합리적 언어, score.표현의 언어, score.수용의 언어],
                 backgroundColor: ['#FF6B6B', '#4D96FF', '#6BCB77', '#FFD93D', '#6E85B7']
             }]
         },
