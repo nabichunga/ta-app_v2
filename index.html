@@ -48,15 +48,12 @@
     각 문항을 읽고 자신과 얼마나 일치하는지 선택해 주세요.<br><br>
 
     5점 척도 기준:<br>
-    - 매우 그렇다 (5점)<br>
-    - 그렇다 (4점)<br>
-    - 보통이다 (3점)<br>
-    - 그렇지 않다 (2점)<br>
-    - 전혀 그렇지 않다 (1점)<br><br>
+    - 매우 그렇다 (5점) / 그렇다 (4점) / 보통이다 (3점) / 그렇지 않다 (2점) / 전혀 그렇지 않다 (1점)
+</div>
 
-    <b>유의사항</b><br>
-    - 자신을 객관적으로 바라보며 응답해 주세요.<br>
-    - ‘이렇게 되고 싶다’가 아니라 ‘실제 나의 모습’을 기준으로 선택해 주세요.
+<div class="question-card" style="border-left: 5px solid var(--primary);">
+    <span class="question-title">성함을 입력해 주세요.</span>
+    <input type="text" id="userName" placeholder="이름 입력" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1.1rem; box-sizing: border-box;">
 </div>
 
 <form id="quiz"></form>
@@ -65,9 +62,9 @@
 <canvas id="chart" style="display:none;"></canvas>
 
 <script>
+// 강사님의 새로운 웹 앱 URL 적용됨
 const scriptURL = "https://script.google.com/macros/s/AKfycbyh1swBDkYzJjBMVUC7TH-38G_gi5HrcEipMo7Ck5RylSgldJYwhPyRzuq35wPJa7vSPQ/exec";
 
-// ✅ 50개 문항 최종 검수 완료 (강사님 원문 100% 일치)
 const questions = [
     ["나는 규칙과 기준을 지키는 것을 중요하게 생각한다","CP"], ["나는 나보다 다른 사람을 먼저 배려하려 한다","NP"], ["나는 말과 행동을 할 때 냉정하고 침착하게 한다","A"], ["나는 감정을 솔직하게 표현한다","FC"], ["나는 다른 사람 기대에 맞추려 한다","AC"],
     ["나는 어떤 사건에 대해 잘 잘못을 가리지 않으면 마음이 편치 않다","CP"], ["나는 사람을 챙기는 편이다","NP"], ["나는 논리적이고 객관성을 유지하려고 한다","A"], ["나는 즐거운 분위기를 만든다","FC"], ["나는 갈등을 피하려 한다","AC"],
@@ -95,7 +92,11 @@ questions.forEach((q, i) => {
 form.innerHTML = htmlContent;
 
 function showResult() {
-    let score = {CP: 0, NP: 0, A: 0, FC: 0, AC: 0};
+    // 이름 확인 로직 추가
+    const nameInput = document.getElementById("userName").value;
+    if (!nameInput) { alert("성함을 입력해 주세요."); return; }
+
+    let score = {name: nameInput, CP: 0, NP: 0, A: 0, FC: 0, AC: 0};
     const selected = document.querySelectorAll("input[type='radio']:checked");
     if (selected.length < 50) { alert("모든 문항에 응답해주세요. 현재 " + selected.length + "개 응답함."); return; }
 
@@ -105,18 +106,11 @@ function showResult() {
     resDiv.style.display = "block";
     
     resDiv.innerHTML = `
-        <h3 style="margin-top:0; border-bottom:2px solid #eee; padding-bottom:10px;">진단 결과 분석</h3>
+        <h3 style="margin-top:0; border-bottom:2px solid #eee; padding-bottom:10px;">${nameInput} 님의 진단 결과</h3>
         <p style="font-size:1.1rem; line-height:1.8;">
             <b>통제의 언어:</b> ${score.CP} / <b>배려의 언어:</b> ${score.NP} / <b>합리적 언어:</b> ${score.A} <br>
             <b>표현의 언어:</b> ${score.FC} / <b>수용의 언어:</b> ${score.AC}
         </p>
-        <div style="background:#f9f9f9; padding:15px; border-radius:10px; margin-top:15px; font-size:0.95rem;">
-            당신은 사람을 배려하고 관계를 중요하게 생각하는 성향이 강합니다.<br>
-            자신의 감정을 비교적 잘 표현하며, 따뜻한 분위기를 만드는 데 강점이 있습니다.<br>
-            주변 사람들에게 긍정적인 영향을 주는 유형입니다.<br>
-            다만 감정에 치우쳐 판단하거나 자기 의견을 미루는 경향이 있을 수 있습니다.<br>
-            균형을 위해 <b>이성적 판단(합리적 언어)</b>을 함께 활용하는 것이 중요합니다.
-        </div>
     `;
 
     const ctx = document.getElementById("chart");
@@ -136,6 +130,7 @@ function showResult() {
         options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 50 } } }
     });
 
+    // 구글 시트로 전송 (이름 포함됨)
     fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(score) });
     window.scrollTo({ top: resDiv.offsetTop - 20, behavior: 'smooth' });
 }
