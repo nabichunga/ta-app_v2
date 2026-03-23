@@ -32,6 +32,7 @@
         .submit-btn:hover { background: #1a252f; }
         #result { display: none; background: white; padding: 30px; border-radius: 15px; border: 2px solid var(--primary); margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         canvas { background: white; border-radius: 15px; padding: 15px; margin-top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .analysis-box { background:#f9f9f9; padding:20px; border-radius:10px; margin-top:15px; font-size:1rem; border-left:5px solid var(--primary); line-height:1.7; }
         @media (max-width: 600px) { .options span { height: 50px; font-size: 16px; } .submit-btn { padding: 18px; font-size: 1.1rem; } }
     </style>
 </head>
@@ -40,15 +41,9 @@
 <div class="guide-box">
     <h2>TA 자아 상태 진단</h2>
     <b>검사 안내</b><br><br>
-    • 검사명: TA 자아상태 진단<br>
-    • 문항 수: 총 50문항<br>
-    • 소요 시간: 약 10분<br><br>
-
+    • 검사명: TA 자아상태 진단 / 총 50문항 / 약 10분 소요<br><br>
     <b>응답 방법</b><br>
-    각 문항을 읽고 자신과 얼마나 일치하는지 선택해 주세요.<br><br>
-
-    5점 척도 기준:<br>
-    - 매우 그렇다 (5점) / 그렇다 (4점) / 보통이다 (3점) / 그렇지 않다 (2점) / 전혀 그렇지 않다 (1점)
+    각 문항을 읽고 실제 나의 모습을 기준으로 선택해 주세요.
 </div>
 
 <div class="question-card" style="border-left: 5px solid var(--primary);">
@@ -58,11 +53,11 @@
 
 <form id="quiz"></form>
 <button class="submit-btn" onclick="showResult()">결과 분석하기</button>
+
 <div id="result"></div>
 <canvas id="chart" style="display:none;"></canvas>
 
 <script>
-// 강사님의 새로운 웹 앱 URL 적용됨
 const scriptURL = "https://script.google.com/macros/s/AKfycbyh1swBDkYzJjBMVUC7TH-38G_gi5HrcEipMo7Ck5RylSgldJYwhPyRzuq35wPJa7vSPQ/exec";
 
 const questions = [
@@ -92,25 +87,38 @@ questions.forEach((q, i) => {
 form.innerHTML = htmlContent;
 
 function showResult() {
-    // 이름 확인 로직 추가
     const nameInput = document.getElementById("userName").value;
     if (!nameInput) { alert("성함을 입력해 주세요."); return; }
 
-    let score = {name: nameInput, CP: 0, NP: 0, A: 0, FC: 0, AC: 0};
     const selected = document.querySelectorAll("input[type='radio']:checked");
-    if (selected.length < 50) { alert("모든 문항에 응답해주세요. 현재 " + selected.length + "개 응답함."); return; }
+    if (selected.length < 50) { alert("모든 문항에 응답해주세요."); return; }
 
+    let score = {name: nameInput, CP: 0, NP: 0, A: 0, FC: 0, AC: 0};
     selected.forEach(s => { const type = s.name.split("_")[2]; score[type] += parseInt(s.value); });
+
+    // 분석 멘트 결정 로직
+    let analysisMsg = "";
+    if (score.NP >= score.CP && score.NP >= 35) {
+        analysisMsg = "따뜻하고 수용적인 태도로 주변 사람들을 잘 챙기는 스타일입니다. 팀의 분위기를 화목하게 만드는 능력이 뛰어나시네요. 다만, 가끔은 자신의 필요보다 타인의 요구를 우선시하여 에너지가 소모될 수 있으니 스스로를 돌보는 시간도 챙겨보세요.";
+    } else if (score.A >= 35) {
+        analysisMsg = "매우 이성적이고 합리적인 판단력을 갖추고 계십니다. 감정에 치우치기보다 데이터와 사실을 기반으로 문제를 해결하는 능력이 돋보입니다. 팀원들과 소통할 때 따뜻한 공감의 언어를 한 스푼 더해주신다면 완벽한 소통 전문가가 되실 거예요.";
+    } else if (score.CP >= 35) {
+        analysisMsg = "명확한 기준과 도덕성을 중요하게 생각하며, 강력한 추진력을 가진 리더 타입입니다. 질서를 유지하고 목표를 달성하는 데 큰 강점이 있습니다. 팀원들의 자율성을 조금 더 존중해 주신다면 더 큰 시너지를 낼 수 있습니다.";
+    } else {
+        analysisMsg = "전체적으로 균형 잡힌 자아 상태를 보여주고 계십니다. 상황에 따라 유연하게 대처하는 능력이 있으시네요. 현재의 긍정적인 소통 방식을 유지하면서, 본인이 더 개발하고 싶은 부분을 의식적으로 연습해 보시기 바랍니다.";
+    }
 
     const resDiv = document.getElementById("result");
     resDiv.style.display = "block";
-    
     resDiv.innerHTML = `
-        <h3 style="margin-top:0; border-bottom:2px solid #eee; padding-bottom:10px;">${nameInput} 님의 진단 결과</h3>
-        <p style="font-size:1.1rem; line-height:1.8;">
-            <b>통제의 언어:</b> ${score.CP} / <b>배려의 언어:</b> ${score.NP} / <b>합리적 언어:</b> ${score.A} <br>
-            <b>표현의 언어:</b> ${score.FC} / <b>수용의 언어:</b> ${score.AC}
+        <h3 style="margin:0 0 15px 0; border-bottom:2px solid #eee; padding-bottom:10px;">${nameInput} 님의 진단 결과</h3>
+        <p style="font-size:1.1rem; line-height:1.6; color:var(--dark);">
+            CP:${score.CP} / NP:${score.NP} / A:${score.A} / FC:${score.FC} / AC:${score.AC}
         </p>
+        <div class="analysis-box">
+            <strong>[전문가 코칭]</strong><br>
+            ${analysisMsg}
+        </div>
     `;
 
     const ctx = document.getElementById("chart");
@@ -121,7 +129,7 @@ function showResult() {
     new Chart(ctx, {
         type: "bar",
         data: {
-            labels: ["통제의 언어", "배려의 언어", "합리적 언어", "표현의 언어", "수용의 언어"],
+            labels: ["통제(CP)", "배려(NP)", "합리(A)", "표현(FC)", "수용(AC)"],
             datasets: [{
                 data: [score.CP, score.NP, score.A, score.FC, score.AC],
                 backgroundColor: ['#FF6B6B', '#4D96FF', '#6BCB77', '#FFD93D', '#6E85B7']
@@ -130,7 +138,6 @@ function showResult() {
         options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 50 } } }
     });
 
-    // 구글 시트로 전송 (이름 포함됨)
     fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(score) });
     window.scrollTo({ top: resDiv.offsetTop - 20, behavior: 'smooth' });
 }
